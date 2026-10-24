@@ -6,8 +6,13 @@ LABEL version="1.0.0"
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
-ARG SPOTWEB_REPOSITORY=https://github.com/spotweb/spotweb
-ARG SPOTWEB_BRANCH=develop
+RUN install-php-extensions \
+    gd \
+    gettext \
+    intl \
+    pdo_mysql \
+    pdo_pgsql \
+    zip
 
 # Disable timeout for starting services to make "wait for sql" work
 ENV S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0
@@ -28,25 +33,14 @@ RUN apk --no-cache upgrade && \
         ca-certificates \
         shadow \
         curl \
-        git \
         nginx \
         tar \
         xz \
         tzdata \
-        s6-overlay \
-    && \
-    # Install PHP extensions not bundled with the official image
-    install-php-extensions \
-        gd \
-        gettext \
-        intl \
-        pdo_mysql \
-        pdo_pgsql \
-        zip \
-    git clone --no-checkout -b ${SPOTWEB_BRANCH} --depth=1 --single-branch ${SPOTWEB_REPOSITORY} /app && \
-    cd /app && \
-    git checkout && \
-    rm -rf /app/.git
+        s6-overlay
+
+# Fetch Spotweb
+ADD https://github.com/spotweb/spotweb.git#develop /app
 
 # Configure Spotweb
 COPY ./conf/spotweb /app

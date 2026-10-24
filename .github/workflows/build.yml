@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Clone Spotweb ${{ matrix.branch }} branch
         id: repo
@@ -101,6 +101,9 @@ jobs:
           file: Dockerfile
           load: true
           tags: ${{ steps.docker_meta.outputs.tags }}
+          no-cache: ${{ github.event_name == 'schedule' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           build-args: |
             SPOTWEB_REPOSITORY=${{ env.SPOTWEB_REPOSITORY }}
             SPOTWEB_BRANCH=${{ matrix.branch }}
@@ -160,8 +163,9 @@ jobs:
           push: true
           sbom: true
           provenance: mode=max
+          no-cache: ${{ github.event_name == 'schedule' }}
           cache-from: type=gha
-          cache-to: type=gha
+          cache-to: type=gha,mode=max
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           build-args: |
