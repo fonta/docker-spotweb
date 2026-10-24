@@ -129,10 +129,6 @@ jobs:
         if: ${{ steps.check.outputs.build_image == 'true' }}
         run: npm ci
 
-      - name: Install Playwright Browsers
-        if: ${{ steps.check.outputs.build_image == 'true' }}
-        run: npx playwright install --with-deps
-
       - name: Run Playwright tests
         if: ${{ steps.check.outputs.build_image == 'true' }}
         run: npx playwright test
